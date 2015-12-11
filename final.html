@@ -1,0 +1,352 @@
+<canvas id="canvas" width="500" height="500"></canvas>
+<h1>Enter in your custom text, and click to make the picture pretty!<h1>
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var startX = 200;
+var startY = 200;
+	 
+var context;
+var x;
+var y;
+var download;
+var data;
+var fileInput;
+var img;
+var circles = [];
+
+function Circle(x, y, color) {
+		this.x = x;
+		this.y = y;
+		this.dx = Math.random()*4-2;
+		this.dy = Math.random()*4-2;
+		this.color = color;
+	  }
+function doTransform() {
+	ctx.lineWidth  = 5;
+    ctx.font = '20pt sans-serif';
+    ctx.strokeStyle = 'black';
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+ 
+    // Draw the text
+    var text = document.getElementById('custom-text').value;
+    text = text.toUpperCase();
+    x = canvas.width/2;
+    y = canvas.height - canvas.height/4.5;
+    ctx.strokeText(text, x, y);
+    ctx.fillText(text, x, y);
+	
+  }
+	timer3 = setInterval(doTransform, 0);
+ 
+	  function init() {
+
+
+
+		canvas.onclick = function(event) {
+			handleClick(event.clientX, event.clientY);
+		};
+		timer = setInterval(resizeCanvas, 100);
+      }
+
+	  function handleClick(x, y) {
+	     var found = false;
+		 for (var i=0; i<circles.length; i++) {
+			d = Math.sqrt((circles[i].x - x)*(circles[i].x - x) + (circles[i].y - y)*(circles[i].y - y));
+			if (d <= 30) {
+				circles.splice(i, 1);
+				found = true;
+			}
+		 }
+		 fillBackgroundColor();
+		 if (!found) {
+			var colors = ["red", "green", "blue", "orange", "purple", "yellow"];
+			var color = colors[Math.floor(Math.random()*colors.length)];
+			circles.push(new Circle(x, y, color));
+		}
+		for (var i=0; i<circles.length; i++) {
+			drawCircle(circles[i]);
+		}
+	  }
+	  function drawCircle(circle) {
+		 ctx.beginPath();
+		 ctx.arc(circle.x, circle.y, 30, 0, degreesToRadians(360), true);
+		 ctx.fillStyle = circle.color;
+		 ctx.fill();
+		 if (circle.x + circle.dx > canvas.width || circle.x + circle.dx < 0)
+			circle.dx = -circle.dx;
+		 if (circle.y + circle.dy > canvas.height || circle.y + circle.dy < 0)
+			circle.dy = -circle.dy;
+		 circle.x += circle.dx;
+		 circle.y += circle.dy;
+	  }
+	  function resizeCanvas() {
+        canvas.width = 500;
+        canvas.height = 500;
+		fillBackgroundColor();
+		for (var i=0; i<circles.length; i++) {
+			drawCircle(circles[i]);
+		 }
+      }
+	function degreesToRadians(degrees) {
+		//converts from degrees to radians and returns
+		return (degrees * Math.PI)/180;
+	}
+	  function fillBackgroundColor() {
+		 //var colors = ["white", "yellow", "blue", "red"];
+		 //var bgColor = colors[Math.floor(Math.random() * colors.length)];
+		 ctx.fillStyle = 'black';
+		 ctx.fillRect(0, 0, canvas.width, canvas.height);
+	}
+
+
+
+
+
+ function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+		var words = text.split(' ');
+		var line = '';
+
+		for(var n = 0; n < words.length; n++) {
+		  var testLine = line + words[n] + ' ';
+		  var metrics = ctx.measureText(testLine);
+		  var testWidth = metrics.width;
+		  if (testWidth > maxWidth && n > 0) {
+			ctx.strokeText(line, x, y);
+			ctx.fillText(line, x, y);
+			line = words[n] + ' ';
+			y += lineHeight;
+		  }
+		  else {
+			line = testLine;
+		  }
+		}
+		ctx.strokeText(line, x, y);
+		ctx.fillText(line, x, y);
+  }
+
+
+var renderToCanvas = function (width, height, renderFunction) {
+    var buffer = document.createElement('canvas');
+    buffer.width = width;
+    buffer.height = height;
+    renderFunction(buffer.getContext('2d'));
+    return buffer;
+};
+var starRender = renderToCanvas(640, 480 + 256, function (ctx) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(47.6, 15.5);
+      ctx.lineTo(76.9, 0.0);
+      ctx.lineTo(71.3, 32.7);
+      ctx.lineTo(95.1, 55.9);
+      ctx.lineTo(62.2, 60.7);
+      ctx.lineTo(47.6, 90.5);
+      ctx.lineTo(32.9, 60.7);
+      ctx.lineTo(0.0, 55.9);
+      ctx.lineTo(23.8, 32.7);
+      ctx.lineTo(18.2, 0.0);
+      ctx.lineTo(47.6, 15.5);
+      ctx.closePath();
+      ctx.fillStyle = "rgb(242, 255, 0)";
+      ctx.fill();
+      ctx.restore();
+});
+var cloudRender = renderToCanvas(640, 480 + 256, function (ctx) {
+	ctx.beginPath();
+	ctx.moveTo(startX, startY);
+	ctx.bezierCurveTo(startX - 40, startY + 10, startX - 20, startY + 180, startX + 60, startY + 70);
+	ctx.bezierCurveTo(startX + 100, startY + 100, startX + 150, startY + 100, startX + 150, startY + 70);
+	ctx.bezierCurveTo(startX + 280, startY + 70, startX + 230, startY + 40, startX + 210, startY + 20);
+	ctx.bezierCurveTo(startX + 360, startY - 40, startX + 210, startY - 50, startX + 160, startY - 30);
+	ctx.bezierCurveTo(startX + 150, startY - 75, startX + 80, startY - 60, startX + 70, startY - 30);
+	ctx.bezierCurveTo(startX + 30, startY - 75, startX - 10, startY - 60, startX, startY);
+	ctx.closePath();
+	ctx.strokeStyle = "#0000";
+	ctx.stroke();
+	ctx.fillStyle = "rgb(255, 255, 255)";
+	ctx.fill();
+	ctx.restore();
+});
+var heartRender = renderToCanvas(640, 480 + 256, function (ctx) {
+		ctx.beginPath();
+		
+		//Time for some colors
+		var colors = ["red"];
+	    ctx.fillStyle = colors;
+		ctx.fill();
+	
+		ctx.moveTo(75,40);
+		ctx.bezierCurveTo(75,37,70,25,50,25);
+		ctx.bezierCurveTo(20,25,20,62.5,20,62.5);
+		ctx.bezierCurveTo(20,80,40,102,75,120);
+		ctx.bezierCurveTo(110,102,130,80,130,62.5);
+		ctx.bezierCurveTo(130,62.5,130,25,100,25);
+		ctx.bezierCurveTo(85,25,75,37,75,40);
+		ctx.fill();
+	});
+var W = 500; var H = 500;
+var particles = [];
+for(var i = 0; i < 5; i++)
+{
+	particles.push(new create_particle());
+}
+var squares = [];
+for(var z = 0; z < 5; z++)
+{
+	squares.push(new create_square());
+}
+var hearts = [];
+for(var u = 0; u < 5; u++)
+{
+	hearts.push(new create_heart());
+}
+function create_particle()
+{
+	this.x = Math.random()*W;
+	this.y = Math.random()*H;
+	
+	this.vx = Math.random()*20-10;
+	this.vy = Math.random()*20-10;
+	
+	
+	var r = Math.random()*255>>0;
+	var g = Math.random()*255>>0;
+	var b = Math.random()*255>>0;
+	this.color = "rgba("+r+", "+g+", "+b+", 0.5)";
+	
+	this.radius = Math.random()*20+20;
+}
+function create_square()
+{
+	this.x = Math.random()*W;
+	this.y = Math.random()*H;
+	
+	this.vx = Math.random()*20-10;
+	this.vy = Math.random()*20-10;
+	
+	
+	var r = Math.random()*255>>0;
+	var g = Math.random()*255>>0;
+	var b = Math.random()*255>>0;
+	this.color = "rgba("+r+", "+g+", "+b+", 0.5)";
+	
+}
+function create_heart()
+{
+	this.x = Math.random()*W;
+	this.y = Math.random()*H;
+	
+	this.vx = Math.random()*20-10;
+	this.vy = Math.random()*20-10;
+	
+	
+	var r = Math.random()*255>>0;
+	var g = Math.random()*255>>0;
+	var b = Math.random()*255>>0;
+	this.color = "rgba("+r+", "+g+", "+b+", 0.5)";
+	
+}
+var x = 100; var y = 100;
+//Lets animate the particle
+
+	var sx = 200;
+	var sy = 400;
+	var cy = 100;
+	var hy = 200;
+	var scrollOffset = 250;
+	var g = 1;
+function draw()
+{
+	for (var f = 0; f < 200; f++) 
+	{
+	sx+=.01;
+	sy+=.01;
+	ctx.save();	
+	ctx.translate(sx, sy);
+	ctx.drawImage(starRender, 50, -256);
+	ctx.restore();
+	}
+	for (var v = 0; v < 200; v++) 
+	{
+	cy+=.01;
+	ctx.save();	
+	ctx.translate(0, cy);
+	ctx.drawImage(cloudRender, 50, -256);
+	ctx.restore();
+	}
+	
+	for (var h = 0; h < 200; h++) 
+	{
+	hy+=.01;
+	ctx.save();	
+	ctx.translate(0, hy);
+	ctx.drawImage(heartRender, 50, -256);
+	ctx.restore();
+	}
+
+	ctx.globalCompositeOperation = "source-over";
+	
+	
+	ctx.fillStyle = 'white';
+	ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+	ctx.fillRect(0, 0, W, H);
+	
+	ctx.globalCompositeOperation = "lighter";
+	
+	for(var t = 0; t < particles.length; t++)
+	{
+		var p = particles[t];
+		
+		ctx.beginPath();
+		
+		//Time for some colors
+		var colors = ["cyan"];
+		color = colors[Math.floor(Math.random()*colors.length)];
+	    ctx.fillStyle = color;
+		ctx.fill();
+		ctx.arc(p.x, p.y, p.radius, Math.PI*2, false);
+		ctx.fill();
+		
+		//Lets use the velocity now
+		p.x += p.vx;
+		p.y += p.vy;
+		
+		//To prevent the balls from moving out of the canvas
+		if(p.x < -50) p.x = W+50;
+		if(p.y < -50) p.y = H+50;
+		if(p.x > W+50) p.x = -50;
+		if(p.y > H+50) p.y = -50;
+	}
+	for(var q = 0; q < squares.length; q++)
+	{
+		var s = squares[q];
+		
+		ctx.beginPath();
+		ctx.rect(s.x, s.y, 20, 20);
+		//Time for some colors
+		var colors = ["blue"];
+		color = colors[Math.floor(Math.random()*colors.length)];
+	    ctx.fillStyle = color;
+		ctx.fill();
+		
+		//Lets use the velocity now
+		s.x += s.vx;
+		s.y += s.vy;
+		
+		//To prevent the balls from moving out of the canvas
+		if(s.x < -50) s.x = W+50;
+		if(s.y < -50) s.y = H+50;
+		if(s.x > W+50) s.x = -50;
+		if(s.y > H+50) s.y = -50;
+	}
+}
+timer2 = setInterval(draw, 21);
+window.onload = init;
+</script>
+  <span id="controls">
+    <input type='text' id='custom-text' value='<your message>' onkeyup='doTransform()' oninput='doTransform' onpaste='doTransform' style="width:300"/><br />
+
+
+</p>
